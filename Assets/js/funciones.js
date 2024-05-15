@@ -1,3 +1,29 @@
+let tblUsuarios;
+document.addEventListener("DOMContentLoaded", function(){
+    tblUsuarios = $('#tblUsuarios').DataTable( {
+        ajax: {
+            url: base_url + "Usuarios/listar",
+            dataSrc: ''
+        },
+        columns: [{        
+            'data' : 'id'
+        },
+         {
+            'data' : 'usuario'
+         },
+         {
+            'data' : 'nombre'
+         },
+         {
+            'data' : 'estado'
+         },
+         {
+            'data' : 'acciones'
+         }                    
+
+        ]
+    });
+})
 function frmLogin(e){
     e.preventDefault();
     const usuario = document.getElementById("usuario");

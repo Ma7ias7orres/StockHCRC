@@ -10,6 +10,12 @@
             $data = $this->select($sql);
             return $data;
         }
+        public function getUsuarios()
+        {
+            $sql = "SELECT * FROM usuarios";   
+            $data = $this->selectAll($sql);
+            return $data;
+        }
         
     }
 
