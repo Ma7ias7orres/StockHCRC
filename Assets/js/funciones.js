@@ -57,8 +57,14 @@ function frmLogin(e){
     
 
 }
-function frmUsuario(){
+function frmUsuario(){    
+    document.getElementById("title").innerHTML = "Nuevo Usuario";
+    document.getElementById("btnAccion").innerHTML = "Registrar";
+    document.getElementById("claves").classList.remove("d-none");  
+    document.getElementById("frmUsuario").reset();
     $("#nuevo_usuario").modal("show");
+    document.getElementById("id").value = "";
+    
 }
 function registrarUser(e){
     e.preventDefault();
@@ -66,23 +72,15 @@ function registrarUser(e){
     const nombre = document.getElementById("nombre");
     const clave = document.getElementById("clave");
     const confirmar = document.getElementById("confirmar");
-    if(usuario.value == "" || nombre.value == "" || clave.value == ""){
+    if(usuario.value == "" || nombre.value == ""){
         Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: "Todos los campos son obligatorios",
+            position: 'top-end',
+            icon: 'error',
+            title: 'Todos los campos son obligatorios',
             showConfirmButton: false,
             timer: 3000
-          });
-    }else  if(clave.value != confirmar.value){
-        Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: "Las contraseñas no coinciden",
-            showConfirmButton: false,
-            timer: 3000
-          });
-    }else {
+          })
+    } else {
         const url = base_url + "Usuarios/registrar";
         const frm = document.getElementById("frmUsuario");
         const http = new XMLHttpRequest();
@@ -90,29 +88,136 @@ function registrarUser(e){
         http.send(new FormData(frm));
         http.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
-                const res = JSON.parse(this.responseText);
+                const res = JSON.parse(this.responseText);                
                 if(res == "si"){
                     Swal.fire({
-                        position: "top-end",
-                        icon: "success",
-                        title: "Usuario registrado con exito",
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Usuario registrado con exito',
                         showConfirmButton: false,
                         timer: 3000
-                      });
-                      frm.reset();
+                      })
+                      frm.reset();                      
                       $("#nuevo_usuario").modal("hide");
+                      tblUsuarios.ajax.reload();
+                }else if(res == "modificado"){
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Usuario modificado con exito',
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                      $("#nuevo_usuario").modal("hide");
+                      tblUsuarios.ajax.reload();
                 }else{
                     Swal.fire({
-                        position: "top-end",
-                        icon: "error",
+                        position: 'top-end',
+                        icon: 'error',
                         title: res,
                         showConfirmButton: false,
                         timer: 3000
+                    })
+                }
+            }  
+        }     
+          
+    }
+}
+function btnEditarUser(id){
+    document.getElementById("title").innerHTML = "Actualizar Usuario";
+    document.getElementById("btnAccion").innerHTML = "Modificar";
+    const url = base_url + "Usuarios/editar/"+id;        
+        const http = new XMLHttpRequest();
+        http.open("GET", url, true);
+        http.send();
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                  JSON.parse(this.responseText);
+                  const res = JSON.parse(this.responseText);
+                  document.getElementById("id").value = res.id;
+                  document.getElementById("usuario").value = res.usuario;
+                  document.getElementById("nombre").value = res.nombre;
+                  document.getElementById("claves").classList.add("d-none");                
+                  $("#nuevo_usuario").modal("show");
+            }
+        }   
+    
+}
+function btnEliminarUser(id){
+    Swal.fire({
+        title: "¿Esta seguro de eliminar?",
+        text: "El usuario no se eliminara de forma permanente, solo cambiara el estado a inactivo!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si!",
+        cancelButtonText: "No",
+      }).then((result) => {
+        if (result.isConfirmed) {            
+            const url = base_url + "Usuarios/eliminar/"+id;        
+            const http = new XMLHttpRequest();
+            http.open("GET", url, true);
+            http.send();
+            http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText); 
+                if( res == "ok"){
+                    Swal.fire({
+                        title: "Mensaje",
+                        text: "Usuario eliminado con exito.",
+                        icon: "success"
+                      });
+                      tblUsuarios.ajax.reload();
+                }else{
+                    Swal.fire({
+                        title: "Mensaje",
+                        text: res,
+                        icon: "error"
                       });
                 }
             }
+        } 
+          
         }
-    }
-    
-
+      });
+}
+function btnReingresarUser(id){
+    Swal.fire({
+        title: "¿Esta seguro de reingresar?",        
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si!",
+        cancelButtonText: "No",
+      }).then((result) => {
+        if (result.isConfirmed) {            
+            const url = base_url + "Usuarios/reingresar/"+id;        
+            const http = new XMLHttpRequest();
+            http.open("GET", url, true);
+            http.send();
+            http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText); 
+                if( res == "ok"){
+                    Swal.fire({
+                        title: "Mensaje",
+                        text: "Usuario reingresado con exito.",
+                        icon: "success"
+                      });
+                      tblUsuarios.ajax.reload();
+                }else{
+                    Swal.fire({
+                        title: "Mensaje",
+                        text: res,
+                        icon: "error"
+                      });
+                }
+            }
+        } 
+          
+        }
+      });
 }
