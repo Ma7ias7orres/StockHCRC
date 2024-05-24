@@ -43,6 +43,10 @@
                                     <a class="nav-link" href="<?php echo base_url; ?>Usuarios"><i class="fas fa-user mr-2"></i>Usuarios</a>                                    
                                 </nav>
                             </div>
+                            <a class="nav-link " href="<?php echo base_url; ?>Clientes" >
+                                <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                                Clientes                                
+                            </a>
                         </div>
                     </div>                    
                 </nav>
