@@ -1,4 +1,4 @@
-let tblUsuarios, tblClientes;
+let tblUsuarios, tblClientes, tblProductos;
 document.addEventListener("DOMContentLoaded", function(){
     tblUsuarios = $('#tblUsuarios').DataTable( {
         ajax: {
@@ -55,40 +55,42 @@ document.addEventListener("DOMContentLoaded", function(){
 
         ]
     });
-})
-function frmLogin(e){
-    e.preventDefault();
-    const usuario = document.getElementById("usuario");
-    const clave = document.getElementById("clave");
-    if(usuario.value == ""){
-        clave.classList.remove("is-invalid");
-        usuario.classList.add("is-invalid");
-        usuario.focus();
-    }else  if(clave.value == ""){
-        usuario.classList.remove("is-invalid");
-        clave.classList.add("is-invalid");
-        clave.focus();
-    }else {
-        const url = base_url + "Usuarios/validar";
-        const frm = document.getElementById("frmLogin");
-        const http = new XMLHttpRequest();
-        http.open("POST", url, true);
-        http.send(new FormData(frm));
-        http.onreadystatechange = function(){
-            if(this.readyState == 4 && this.status == 200){
-                const res = JSON.parse(this.responseText);
-                if(res == "ok"){
-                    window.location = base_url + "Usuarios";
-                }else{
-                    document.getElementById("alerta").classList.remove("d-none");
-                    document.getElementById("alerta").innerHTML = res;
-                }
-            }
-        }
-    }
-    
+    //fin de tabla clientes
+    tblProductos = $('#tblProductos').DataTable( {
+        ajax: {
+            url: base_url + "Productos/listar",
+            dataSrc: ''
+        },
+        columns: [
+         {        
+            'data' : 'id'
+         },
+         {
+            'data' : 'nombre'
+         },
+         {
+            'data' : 'serie'
+         },
+         {
+            'data' : 'modelo'
+         },
+         {
+            'data' : 'descripcion'
+         },
+         {
+            'data' : 'sector'
+         },
+         {
+            'data' : 'estado'
+         },         
+         {
+            'data' : 'acciones'
+         }                    
 
-}
+        ]
+    });
+})
+
 function frmUsuario(){    
     document.getElementById("title").innerHTML = "Nuevo Usuario";
     document.getElementById("btnAccion").innerHTML = "Registrar";
@@ -406,6 +408,175 @@ function btnReingresarCli(id){
                         icon: "success"
                       });
                       tblClientes.ajax.reload();
+                }else{
+                    Swal.fire({
+                        title: "Mensaje",
+                        text: res,
+                        icon: "error"
+                      });
+                }
+            }
+        } 
+          
+        }
+      });
+}
+
+//fin Clientes
+
+function frmProducto(){    
+    document.getElementById("title").innerHTML = "Nuevo Producto";
+    document.getElementById("btnAccion").innerHTML = "Registrar";     
+    document.getElementById("frmProducto").reset();
+    $("#nuevo_producto").modal("show");
+    document.getElementById("id").value = "";
+    
+}
+function registrarPro(e){
+    e.preventDefault();
+    const nombre = document.getElementById("nombre");
+    const serie = document.getElementById("serie");
+    const modelo = document.getElementById("modelo");
+    const descripcion = document.getElementById("descripcion");
+    const sector = document.getElementById("sector");
+    if(nombre.value == "" || serie.value == "" || modelo.value == "" || descripcion.value == "" || sector.value == ""   ){
+        Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: 'Todos los campos son obligatorios',
+            showConfirmButton: false,
+            timer: 3000
+          })
+    } else {
+        const url = base_url + "Productos/registrar";
+        const frm = document.getElementById("frmProducto");
+        const http = new XMLHttpRequest();
+        http.open("POST", url, true);
+        http.send(new FormData(frm));
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                console.log(this.responseText);
+                const res = JSON.parse(this.responseText);
+                if(res == "si"){
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Producto registrado con exito',
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                      frm.reset();                      
+                      $("#nuevo_producto").modal("hide");
+                      //tblUsuarios.ajax.reload();
+                }else if(res == "modificado"){
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Producto modificado con exito',
+                        showConfirmButton: false,
+                        timer: 3000
+                      })
+                      $("#nuevo_producto").modal("hide");
+                     // tblUsuarios.ajax.reload();
+                }else{
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'error',
+                        title: res,
+                        showConfirmButton: false,
+                        timer: 3000
+                    })
+                }                
+                
+            }  
+        }     
+          
+    }
+}
+function btnEditarUser(id){
+    document.getElementById("title").innerHTML = "Actualizar Usuario";
+    document.getElementById("btnAccion").innerHTML = "Modificar";
+    const url = base_url + "Usuarios/editar/"+id;        
+        const http = new XMLHttpRequest();
+        http.open("GET", url, true);
+        http.send();
+        http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                  JSON.parse(this.responseText);
+                  const res = JSON.parse(this.responseText);
+                  document.getElementById("id").value = res.id;
+                  document.getElementById("usuario").value = res.usuario;
+                  document.getElementById("nombre").value = res.nombre;
+                  document.getElementById("claves").classList.add("d-none");                
+                  $("#nuevo_usuario").modal("show");
+            }
+        }   
+    
+}
+function btnEliminarUser(id){
+    Swal.fire({
+        title: "¿Esta seguro de eliminar?",
+        text: "El usuario no se eliminara de forma permanente, solo cambiara el estado a inactivo!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si!",
+        cancelButtonText: "No",
+      }).then((result) => {
+        if (result.isConfirmed) {            
+            const url = base_url + "Usuarios/eliminar/"+id;        
+            const http = new XMLHttpRequest();
+            http.open("GET", url, true);
+            http.send();
+            http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText); 
+                if( res == "ok"){
+                    Swal.fire({
+                        title: "Mensaje",
+                        text: "Usuario eliminado con exito.",
+                        icon: "success"
+                      });
+                      tblUsuarios.ajax.reload();
+                }else{
+                    Swal.fire({
+                        title: "Mensaje",
+                        text: res,
+                        icon: "error"
+                      });
+                }
+            }
+        } 
+          
+        }
+      });
+}
+function btnReingresarUser(id){
+    Swal.fire({
+        title: "¿Esta seguro de reingresar?",        
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si!",
+        cancelButtonText: "No",
+      }).then((result) => {
+        if (result.isConfirmed) {            
+            const url = base_url + "Usuarios/reingresar/"+id;        
+            const http = new XMLHttpRequest();
+            http.open("GET", url, true);
+            http.send();
+            http.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                const res = JSON.parse(this.responseText); 
+                if( res == "ok"){
+                    Swal.fire({
+                        title: "Mensaje",
+                        text: "Usuario reingresado con exito.",
+                        icon: "success"
+                      });
+                      tblUsuarios.ajax.reload();
                 }else{
                     Swal.fire({
                         title: "Mensaje",
