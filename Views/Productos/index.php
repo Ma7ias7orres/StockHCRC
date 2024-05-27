@@ -7,12 +7,13 @@
     <thead class="thead-dark">
         <tr>
             <th>Id</th>
+            <th>Foto</th>
             <th>Nombre</th>
             <th>Serie</th>
             <th>Modelo</th>
             <th>Descripcion</th>
             <th>Sector</th>
-            <th>Stock</th>
+            <th>Cantidad</th>
             <th>Estado</th>
             <th></th>
         </tr>
@@ -52,7 +53,20 @@
                     <div class="form-group">
                         <label for="sector">Sector</label>
                         <input id="sector" class="form-control" type="text" name="sector" placeholder="Sector del Producto">
-                    </div>                    
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Foto</label>
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <label for="imagen" id="icon-image" class="btn btn-primary"><i class="fas fa-image" ></i> </label>
+                                    <span id="icon-cerrar"></span>
+                                    <input id="imagen" class="d-none" type="file" name="imagen" onchange="preview(event)">
+                                    <img class="img-thumbnail" id="img-preview">
+                                </div>
+                            </div>
+                        </div>
+                    </div>                
                     <button class="btn btn-primary" type="button" onclick ="registrarPro(event);" id="btnAccion">Registrar</button>
                     <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
                 </form>               
